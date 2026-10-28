@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bednarska — rejestr wysyłek</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+:root{--bg:#f5f6f2;--paper:#fff;--ink:#183a32;--muted:#62736b;--line:#dce3dd;--accent:#d9ee95;--green:#285c49}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"DM Sans",sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer;transition:background .2s,transform .2s}
+button:hover{background:#e7eddf;transform:translateY(-1px)}
+button:active{transform:scale(.98)}
+button:disabled{opacity:.5;cursor:wait}
+:focus-visible{outline:3px solid #578941;outline-offset:3px}
+header{height:78px;display:flex;align-items:center;justify-content:space-between;padding:0 4vw;border-bottom:1px solid var(--line);background:var(--paper)}
+.brand{display:flex;align-items:center;gap:12px;font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:20px}
+.logo{width:33px;height:33px;background:var(--ink);display:grid;place-items:center;color:var(--accent);border-radius:7px}
+.private{font-size:12px;color:var(--muted)}
+main{max-width:1600px;margin:auto;padding:44px 4vw}
+.hero{display:flex;justify-content:space-between;align-items:flex-end;gap:25px;margin-bottom:32px;animation:reveal .6s both}
+.eyebrow{font-size:11px;letter-spacing:2px;font-weight:700;color:var(--muted);text-transform:uppercase}
+h1{font:600 clamp(30px,4vw,48px)/1.15 "Space Grotesk",sans-serif;letter-spacing:-2px;margin:12px 0}
+.hero p{color:var(--muted);font-size:14px;margin:0;line-height:1.7}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+button{border:1px solid var(--line);background:white;border-radius:7px;padding:11px 16px;font-size:13px;font-weight:600;color:var(--ink)}
+.primary{background:var(--ink);color:white;border-color:var(--ink)}
+.primary:hover{background:var(--green)}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:23px 0;margin-bottom:28px;animation:reveal .6s .1s both}
+.metric{padding:0 24px;border-right:1px solid var(--line)}
+.metric:first-child{padding-left:0}.metric:last-child{border:0}
+.metric span{font-size:12px;color:var(--muted)}
+.metric strong{display:block;font:500 36px "Space Grotesk",sans-serif;margin-top:8px}
+.metric small{font-size:12px;margin-left:6px;color:var(--muted)}
+.progress{height:4px;background:var(--line);margin-top:12px;border-radius:3px;overflow:hidden}
+.progress div{height:100%;background:var(--green);transition:width .4s}
+.import{border:1px dashed #a9b9a9;padding:23px;background:linear-gradient(110deg,#edf2e6,#f7f9f3);display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:28px;border-radius:8px;animation:reveal .6s .2s both}
+.import.drag{background:#d9ee95;border-color:var(--green)}
+.import h2{font:600 17px "Space Grotesk",sans-serif;margin:0 0 5px}
+.import p{font-size:12px;color:var(--muted);margin:0;line-height:1.7}
+.tools{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:20px 0}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tabs button{border:0;background:transparent}
+.tabs button[aria-pressed=true]{background:var(--ink);color:white}
+.search{padding:11px 14px;border:1px solid var(--line);background:white;border-radius:7px;width:260px}
+.table-wrap{overflow:auto;background:white;border:1px solid var(--line);border-radius:8px;max-height:65vh;animation:reveal .6s .3s both}
+table{border-collapse:separate;border-spacing:0;width:100%;white-space:nowrap;font-size:13px}
+th{position:sticky;top:0;background:#eef2eb;z-index:2;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.6px;text-align:left;padding:16px 12px;border-bottom:1px solid var(--line)}
+td{padding:12px;border-bottom:1px solid #edf0eb}
+tbody tr:hover{background:#f7f9f3}
+td.name{font-weight:700}td.num{font-variant-numeric:tabular-nums}
+.qty{width:60px;border:1px solid transparent;border-radius:5px;background:#f5f7f1;text-align:center;padding:7px;color:var(--ink)}
+.qty:hover,.qty:focus{border-color:#b2c2ac}
+.status{font-size:11px;border-radius:4px;padding:5px 8px;display:inline-block;background:#f0f1ed;color:#64716a}
+.status.done{background:#e4f0d6;color:#356029}
+.status.partial{background:#fff0d4;color:#805b1c}
+.check{width:18px;height:18px;accent-color:var(--green);cursor:pointer}
+tfoot td{position:sticky;bottom:0;background:#eaf0e4;font-weight:700;border-top:1px solid var(--line)}
+.notice{font-size:12px;padding:12px 15px;margin-bottom:18px;background:#fff3dd;border-left:3px solid #be9343;line-height:1.7}
+footer{display:flex;justify-content:space-between;gap:12px;margin-top:18px;font-size:11px;color:var(--muted);line-height:1.7}
+.date{border:1px solid var(--line);border-radius:5px;padding:6px;color:var(--ink);background:white}
+#message{min-height:20px;font-size:12px;color:var(--green);margin-top:10px}
+.empty{text-align:center;padding:40px;color:var(--muted)}
+@keyframes reveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media(max-width:750px){header{padding:0 20px}.private{max-width:110px;text-align:right}main{padding:28px 20px}.hero,.import{align-items:flex-start;flex-direction:column}.metrics{grid-template-columns:1fr 1fr;gap:22px}.metric{padding:0;border:0}.tools{align-items:stretch;flex-direction:column}.search{width:100%}footer{flex-direction:column}h1{letter-spacing:-1px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header><div class="brand"><span class="logo">▦</span> Rejestr wysyłek</div><span class="private">● Dane na Twoim urządzeniu</span></header>
+<main>
+<section class="hero">
+<div><div class="eyebrow">Projekt 908 / kontrola realizacji</div><h1>UW Bednarska<span style="color:#99ac8b">.</span></h1><p>Twoje zestawienie okien. Wysyłki, daty i postęp — w jednym miejscu.</p></div>
+<div class="actions"><button id="backup">↓ Kopia danych</button><button id="restore">Przywróć kopię</button><button id="csv">Eksport CSV</button></div>
+</section>
+<section class="metrics" aria-label="Podsumowanie">
+<div class="metric"><span>Pozycje w zestawieniu</span><strong id="rows">54</strong></div>
+<div class="metric"><span>Łącznie okien</span><strong id="total">—</strong></div>
+<div class="metric"><span>Wysłano</span><strong><b id="sent" style="font-weight:500">20</b><small>szt.</small></strong></div>
+<div class="metric"><span>Pozostało</span><strong id="left">—</strong><div class="progress"><div id="bar"></div></div></div>
+</section>
+<section class="import" id="drop">
+<div><h2>Przenieś zestawienie z Excela</h2><p>Przeciągnij plik tutaj lub wybierz go z dysku. Obsługa .xlsx, .xls oraz .csv.<br>Import zastępuje aktualną tabelę. Odczytywany jest pierwszy arkusz z kolumną „OKNO”.</p></div>
+<button class="primary" id="choose">＋ Importuj Excel</button>
+<input type="file" id="file" accept=".xlsx,.xls,.csv" hidden>
+<input type="file" id="jsonFile" accept=".json" hidden>
+</section>
+<div class="notice" id="warning"></div>
+<div class="tools">
+<nav class="tabs" aria-label="Filtr statusu"><button data-filter="all" aria-pressed="true">Wszystkie</button><button data-filter="active" aria-pressed="false">Do wysłania</button><button data-filter="done" aria-pressed="false">Wysłane</button></nav>
+<input id="search" class="search" type="search" placeholder="Szukaj okna lub pakietu…" aria-label="Szukaj okna lub pakietu">
+</div>
+<div class="table-wrap"><table><thead id="head"></thead><tbody id="body"></tbody><tfoot id="foot"></tfoot></table></div>
+<div id="message" role="status" aria-live="polite"></div>
+<footer><span>Zmieniaj ilości w kolumnach wysyłek. Checkbox uzupełnia pozostałą ilość w wybranej dacie.<br>Data u góry kolumny jest datą wysyłki, nie datą odhaczenia.</span><span id="saveStatus">Zapis lokalny • automatyczny</span></footer>
+<div style="margin-top:20px"><button id="newDate">＋ Dodaj datę wysyłki</button> <button id="reset">Przywróć zestawienie źródłowe</button></div>
+<p style="font-size:11px;color:var(--muted);line-height:1.8;margin-top:22px">Pliki są przetwarzane w przeglądarce, nie są wysyłane na serwer. Odczyt Excela wymaga internetu przy pierwszym załadowaniu biblioteki. CSV i zapisane dane działają bez niej. Czcionki pobierane są z Google Fonts. Dane nie synchronizują się między urządzeniami — zapisuj kopie.</p>
+</main>
+<script>
+const KEY='bednarska_excel_v3';
+const source=`OZ-2-3|2015|2450|G2|1
+OZ-2-3|2015|2450|G3|1
+OZ-2-4|2575|2450|G2|1
+OZ-2-8|2015|3030|G2|1
+OZ-2-9|2015|3273|G2|1
+OZ-2-9|2015|3272|G3|1
+OZ-2-10|2575|3332|G1|1
+OZ-3-7|2015|3073|G2|1
+OZ-3-8|2015|3150|G2|1
+OZ-3-13|2575|5520|TDS|1
+OZ-4-3|2015|5129|G2|1
+OZ-4-3|2015|5129|G3|3
+OZ-4-5|2015|5073|G3|1
+OZ-04-8|2015|5520|G4|1
+OZ-4-8|2015|5520|G2|1
+OZ-4-8|2015|5520|G3|1
+OZ-4-8|2015|5520|G4|1
+OZ-4-9|2015|5520|G2|1
+OZ-04-10|2015|5520|G3|2
+OZ-4-10|2015|5520|G1|2
+OZ-4-10|2015|5520|G2|13
+OZ-4-10|2015|5520|G3|2
+OZ-4-10|2015|5520|G4|1
+OZ-4-11|2015|5590|G3|1
+OZ-4-12|2575|5520|G2|1
+OZ-4-13|2575|5520|G2|3
+OZ-4-14|2575|5520|G1|1
+OZ-4-14|2575|5520|G2|1
+OZ-4-15|2015|5650|G2|1
+OZ-4-15|2015|5650|G3|1
+OZ-4-16|2575|5610|G2|1
+OZ-4-22|2575|5525|G1|1
+OZ-04-23|2015|5464|G3|1
+OZ-4-26|2015|5125|G3|1
+OZ-4-27|2015|5520|G1|1
+OZ-4-28|2015|5150|G3|1
+OZ-4-32|2053|5171|GEI60|1
+OZ-4-36|2575|5520|G1|1
+OZ-4-38|2575|5520|G1|3
+OZ-4-39|2575|5520|G2|1
+OZ-4-42|2575|5520|G2|2
+W158|2015|3073|G2|1
+W158L|2015|3073|G2|1
+W160|2016|5073|G2|
+ZOZ-01|2575|6820|G2|1
+ZOZ-03|2015|6820|G2|1
+ZOZ-03|2015|6820|G3|1
+ZOZ-04|2015|OKNO Z|G3|1
+ZOZ-05|2015|OKNO Z|G3|1
+ZOZ-06|2015|OKNO Z|G1|1
+ZOZ-07|2015|6976|G4|1
+ZOZ-08|2015|OKNO U|G3|1
+ZOZ-09|2015|OKNO Z|G3|1
+ZOZ-10|2015|OKNO Z|G3|1`;
+function original(){
+const rows=source.split('\n').map((line,i)=>{const [name,h,b,glass,q]=line.split('|');return {lp:i+1,name,h,b,glass,total:q===''?null:Number(q),ship:[0,0,0,0]}});
+rows[10].ship=[1,0,0,0];rows[11].ship=[3,0,0,0];
+[13,16,22].forEach(i=>rows[i].ship=[0,0,0,1]);rows[20].ship=[0,8,4,1];
+return {dates:['2026-10-15','2026-10-22','2026-10-26','2026-10-28'],rows,sourceTotal:75};
+}
+let state=original(),filter='all';
+const $=id=>document.getElementById(id);
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sum=r=>r.ship.reduce((a,b)=>a+b,0);
+function validate(s){if(!s||!Array.isArray(s.dates)||!s.dates.length||!s.dates.every(d=>/^\d{4}-\d{2}-\d{2}$/.test(d))||!Array.isArray(s.rows)||!s.rows.length)throw Error('Nieprawidłowa struktura danych.');
+s.rows.forEach(r=>{if(typeof r.name!=='string'||!(r.total===null||Number.isInteger(r.total)&&r.total>=0)||!Array.isArray(r.ship)||r.ship.length!==s.dates.length||!r.ship.every(n=>Number.isInteger(n)&&n>=0)||r.total!==null&&sum(r)>r.total)throw Error('Nieprawidłowe ilości w zestawieniu.');});return s;}
+try{const raw=localStorage.getItem(KEY);if(raw)state=validate(JSON.parse(raw));}catch(e){$('message').textContent='Nie odczytano zapisu. Wczytano zestawienie źródłowe.';}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));$('saveStatus').textContent='✓ Zapisano lokalnie • '+new Date().toLocaleTimeString('pl-PL');}catch(e){$('saveStatus').textContent='⚠ Zapis niedostępny — pobierz kopię danych.';}}
+function render(){
+const total=state.rows.reduce((a,r)=>a+(r.total||0),0),sent=state.rows.reduce((a,r)=>a+sum(r),0);
+$('rows').textContent=state.rows.length;$('total').textContent=total;$('sent').textContent=sent;$('left').textContent=total-sent;$('bar').style.width=(total?sent/total*100:0)+'%';
+const notes=[];
+if(state.sourceTotal!=null&&state.sourceTotal!==total)notes.push(`Uwaga: suma w stopce źródła to ${state.sourceTotal} szt., ale suma podanych wierszy wynosi ${total} szt. Aplikacja liczy na podstawie wierszy.`);
+if(state.rows.some(r=>r.total===null))notes.push('Niektóre pozycje mają pustą ilość (w źródle: W160). Uzupełnij ją, aby oznaczyć wysyłkę.');
+$('warning').textContent=notes.join(' ');$('warning').hidden=!notes.length;
+$('head').innerHTML='<tr><th>Wyk.</th><th>Lp.</th><th>Okno</th><th>H [mm]</th><th>B [mm]</th><th>Pakiet</th><th>Ilość</th>'+state.dates.map((d,i)=>`<th>Wysyłka<br><input class="date" type="date" value="${esc(d)}" data-date="${i}" aria-label="Data wysyłki ${i+1}"></th>`).join('')+'<th>Wysłano</th><th>Pozostało</th><th>Status</th></tr>';
+const query=$('search').value.toLowerCase();
+const visible=state.rows.map((r,i)=>({r,i})).filter(({r})=>(r.name+' '+r.glass).toLowerCase().includes(query)&&(filter==='all'||(filter==='done'?r.total!==null&&r.total>0&&sum(r)===r.total:r.total===null||sum(r)<r.total)));
+$('body').innerHTML=visible.map(({r,i})=>{const sent=sum(r),done=r.total!==null&&r.total>0&&sent===r.total;return `<tr><td><input class="check" type="checkbox" data-check="${i}" ${done?'checked':''} ${r.total===null||r.total===0?'disabled':''} aria-label="Oznacz ${esc(r.name)} ${esc(r.glass)} jako wysłane"></td><td>${esc(r.lp)}</td><td class="name">${esc(r.name)}</td><td>${esc(r.h)}</td><td>${esc(r.b)}</td><td>${esc(r.glass)}</td><td><input class="qty" type="number" min="${sent}" step="1" value="${r.total??''}" data-total="${i}" aria-label="Ilość ${esc(r.name)}"></td>${r.ship.map((n,j)=>`<td><input class="qty" type="number" min="0" step="1" value="${n||''}" data-row="${i}" data-col="${j}" ${r.total===null?'disabled':''} aria-label="${esc(r.name)} wysyłka ${esc(state.dates[j])}"></td>`).join('')}<td class="num">${sent}</td><td class="num">${r.total===null?'—':r.total-sent}</td><td><span class="status ${done?'done':sent?'partial':''}">${done?'✓ Wysłane':sent?'Częściowo':'Do wysłania'}</span></td></tr>`}).join('')||`<tr><td colspan="${10+state.dates.length}" class="empty">Brak pozycji spełniających kryteria.</td></tr>`;
+$('foot').innerHTML=`<tr><td colspan="6">SUMA CAŁOŚĆ</td><td>${total}</td>${state.dates.map((_,j)=>`<td>${state.rows.reduce((a,r)=>a+r.ship[j],0)}</td>`).join('')}<td>${sent}</td><td>${total-sent}</td><td>${total?Math.round(sent/total*100):0}%</td></tr>`;
+}
+$('body').addEventListener('change',e=>{
+const t=e.target;
+if(t.dataset.check!==undefined){const r=state.rows[+t.dataset.check];if(t.checked){const d=prompt('Podaj datę wysyłki pozostałych sztuk (RRRR-MM-DD):',state.dates.at(-1));if(!d){render();return;}if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||isNaN(Date.parse(d))){alert('Nieprawidłowa data.');render();return;}let j=state.dates.indexOf(d);if(j<0){state.dates.push(d);state.rows.forEach(x=>x.ship.push(0));j=state.dates.length-1;}r.ship[j]+=r.total-sum(r);}else{if(!confirm('Wyzerować wszystkie wysyłki tej pozycji?')){render();return;}r.ship.fill(0);}}
+else if(t.dataset.total!==undefined){const r=state.rows[+t.dataset.total],n=t.value===''?null:Number(t.value);if(n===null&&sum(r)>0||n!==null&&(!Number.isInteger(n)||n<sum(r))){alert('Ilość nie może być mniejsza od sumy wysyłek.');render();return;}r.total=n;}
+else if(t.dataset.row!==undefined){const r=state.rows[+t.dataset.row],j=+t.dataset.col,n=Number(t.value);if(!Number.isInteger(n)||n<0||sum(r)-r.ship[j]+n>r.total){alert('Wpisz całkowitą ilość nieprzekraczającą pozostałych sztuk.');render();return;}r.ship[j]=n;}else return;
+save();render();
+});
+$('head').addEventListener('change',e=>{if(e.target.dataset.date===undefined)return;const d=e.target.value,j=+e.target.dataset.date;if(!d||state.dates.some((x,i)=>i!==j&&x===d)){alert('Data musi być niepusta i unikalna.');render();return;}state.dates[j]=d;save();render();});
+document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));render();});
+$('search').oninput=render;
+$('newDate').onclick=()=>{const d=prompt('Data nowej wysyłki (RRRR-MM-DD):',new Date().toISOString().slice(0,10));if(!d)return;if(!/^\d{4}-\d{2}-\d{2}$/.test(d)||isNaN(Date.parse(d))||state.dates.includes(d)){alert('Podaj poprawną, unikalną datę.');return;}state.dates.push(d);state.rows.forEach(r=>r.ship.push(0));save();render();};
+function download(content,name,type){const u=URL.createObjectURL(new Blob([content],{type})),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);}
+$('backup').onclick=()=>download(JSON.stringify(state,null,2),'bednarska-kopia.json','application/json');
+$('restore').onclick=()=>$('jsonFile').click();
+$('jsonFile').onchange=async e=>{try{if(!e.target.files[0])return;const data=validate(JSON.parse(await e.target.files[0].text()));if(confirm('Zastąpić tabelę danymi z kopii?')){state=data;save();render();}}catch(err){alert(err.message);}e.target.value='';};
+$('reset').onclick=()=>{if(confirm('Przywrócić oryginalne 54 pozycje? Bieżące zmiany zostaną zastąpione.')){state=original();save();render();}};
+const csvCell=x=>'"'+String(x??'').replace(/"/g,'""')+'"';
+$('csv').onclick=()=>{const data=[['Lp.','OKNO','H [mm]','B [mm]','PAKIET SZKLENIA','SUMA',...state.dates,'Suma wysyłek','Pozostało'],...state.rows.map(r=>[r.lp,r.name,r.h,r.b,r.glass,r.total,...r.ship,sum(r),r.total===null?'':r.total-sum(r)])];download('\ufeff'+data.map(r=>r.map(csvCell).join(';')).join('\r\n'),'bednarska.csv','text/csv;charset=utf-8');};
+function parseCSV(text){text=text.replace(/^\uFEFF/,'');const line=text.split(/\r?\n/)[0],sep=line.includes(';')?';':line.includes('\t')?'\t':',';let rows=[],row=[],value='',quoted=false;for(let i=0;i<text.length;i++){const c=text[i];if(c==='"'){if(quoted&&text[i+1]==='"'){value+='"';i++;}else quoted=!quoted;}else if(c===sep&&!quoted){row.push(value);value='';}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&text[i+1]==='\n')i++;row.push(value);rows.push(row);row=[];value='';}else value+=c;}if(value||row.length){row.push(value);rows.push(row);}if(quoted)throw Error('Niezamknięty cudzysłów w CSV.');return rows;}
+const norm=x=>String(x??'').trim().toUpperCase().replace(/\s+/g,' ');
+function dateValue(v){
+if(typeof v==='number'&&v>20000&&v<80000){const d=new Date(Date.UTC(1899,11,30)+Math.round(v)*86400000);return d.toISOString().slice(0,10);}
+const s=String(v??''),iso=s.match(/(\d{4})-(\d{2})-(\d{2})/),pl=s.match(/(\d{1,2})[./](\d{1,2})[./](\d{4})/);
+if(iso)return iso[0];if(pl)return `${pl[3]}-${pl[2].padStart(2,'0')}-${pl[1].padStart(2,'0')}`;return null;
+}
+function tableToState(matrix){
+const hi=matrix.findIndex(r=>r.some(x=>norm(x)==='OKNO'));if(hi<0)throw Error('Nie znaleziono kolumny OKNO. Zachowaj nagłówki z oryginalnego zestawienia.');
+const header=matrix[hi],next=matrix[hi+1]||[];
+const find=(test)=>header.findIndex(x=>test(norm(x)));
+const ni=find(x=>x==='OKNO'),gi=find(x=>x.includes('PAKIET')),qi=find(x=>x==='SUMA'||x==='ILOŚĆ'||x==='ILOSC'),li=find(x=>x==='LP.'||x==='LP');
+let hc=find(x=>/^H\b/.test(x)),bc=find(x=>/^B\b/.test(x));
+if(hc<0)hc=next.findIndex(x=>/^H\s*=|^H\s*\[/.test(norm(x)));
+if(bc<0)bc=next.findIndex(x=>/^B\s*=|^B\s*\[/.test(norm(x)));
+if(hc<0)hc=ni+1;if(bc<0)bc=ni+2;
+if(gi<0||qi<0)throw Error('Brak kolumn PAKIET SZKLENIA lub SUMA.');
+const dateCols=[];for(let j=qi+1;j<header.length||j<next.length;j++){const d=dateValue(header[j])||dateValue(next[j]);if(d)dateCols.push({j,d});}
+if(new Set(dateCols.map(x=>x.d)).size!==dateCols.length)throw Error('Nagłówki zawierają powtórzone daty wysyłek.');
+const dates=dateCols.length?dateCols.map(x=>x.d):[new Date().toISOString().slice(0,10)];
+const rows=[];let sourceTotal=null;
+const quantity=v=>{if(v==null||String(v).trim()==='')return null;const n=Number(String(v).replace(/\s/g,'').replace(',','.'));if(!Number.isInteger(n)||n<0)throw Error('Nieprawidłowa ilość: '+v);return n;};
+for(let k=hi+1;k<matrix.length;k++){const a=matrix[k];if(a.some(v=>norm(v).includes('SUMA CAŁOŚĆ')||norm(v).includes('SUMA CALOSC'))){sourceTotal=quantity(a[qi]);continue;}
+const name=String(a[ni]??'').trim();if(!name||name==='OKNO')continue;
+if(!String(a[gi]??'').trim())continue;
+const total=quantity(a[qi]),ship=dateCols.length?dateCols.map(x=>quantity(a[x.j])||0):[0];
+rows.push({lp:li>=0?a[li]||rows.length+1:rows.length+1,name,h:String(a[hc]??''),b:String(a[bc]??''),glass:String(a[gi]??''),total,ship});
+}
+return validate({rows,dates,sourceTotal});
+}
+let libraryPromise;
+function loadExcel(){
+if(window.XLSX)return Promise.resolve(window.XLSX);
+if(!libraryPromise)libraryPromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';s.onload=()=>resolve(window.XLSX);s.onerror=()=>{libraryPromise=null;s.remove();reject(Error('Nie udało się pobrać biblioteki Excel. Połącz się z internetem lub zapisz arkusz jako CSV.'));};document.head.appendChild(s);});
+return libraryPromise;
+}
+async function importFile(file){
+if(!file)return;
+$('choose').disabled=true;$('message').textContent='Odczytywanie pliku…';
+try{
+let data;
+if(/\.csv$/i.test(file.name))data=tableToState(parseCSV(await file.text()));
+else if(/\.(xlsx|xls)$/i.test(file.name)){const X=await loadExcel(),book=X.read(await file.arrayBuffer(),{type:'array'});let found;
+for(const name of book.SheetNames){const m=X.utils.sheet_to_json(book.Sheets[name],{header:1,defval:'',raw:true});if(m.some(r=>r.some(x=>norm(x)==='OKNO'))){found=m;break;}}
+if(!found)throw Error('W skoroszycie nie znaleziono arkusza z kolumną OKNO.');
+data=tableToState(found);
+}else throw Error('Wybierz plik XLSX, XLS lub CSV.');
+if(confirm(`Wczytano ${data.rows.length} pozycji i ${data.dates.length} dat wysyłek. Zastąpić bieżące zestawienie? Najpierw zapisz kopię, jeśli chcesz zachować zmiany.`)){state=data;save();render();$('message').textContent='✓ Zaimportowano '+file.name+' — zachowano ilości wysyłek i daty ze źródła.';}else $('message').textContent='Import anulowany.';
+}catch(err){$('message').textContent='Błąd importu: '+err.message;}
+finally{$('choose').disabled=false;$('file').value='';}
+}
+$('choose').onclick=()=>$('file').click();$('file').onchange=e=>importFile(e.target.files[0]);
+['dragenter','dragover'].forEach(type=>$('drop').addEventListener(type,e=>{e.preventDefault();$('drop').classList.add('drag');}));
+['dragleave','drop'].forEach(type=>$('drop').addEventListener(type,e=>{e.preventDefault();$('drop').classList.remove('drag');if(type==='drop')importFile(e.dataTransfer.files[0]);}));
+render();
+</script>
+</body>
+</html>
